@@ -1,0 +1,528 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <link href="http://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  <link type="text/css" rel="stylesheet" href="css/materialize.min.css"  media="screen,projection"/>
+  <link type="text/css" rel="stylesheet" href="css/customColors.css"  media="screen,projection"/>
+  <link type="text/css" rel="stylesheet" href="css/ion.rangeSlider.css"  media="screen,projection"/>
+  <link type="text/css" rel="stylesheet" href="css/ion.rangeSlider.skinFlat.css"  media="screen,projection"/>
+  <link type="text/css" rel="stylesheet" href="css/index.css"  media="screen,projection"/>
+  <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Formulario</title>
+</head>
+
+<body>
+  <video src="img/video.mp4" id="vidFondo"></video>
+
+  <div class="contenedor">
+    <div class="card rowTitulo">
+      <h1>Bienes Intelcost</h1>
+    </div>
+    <div class="colFiltros">
+
+        <div class="filtrosContenido">
+          <div class="tituloFiltros">
+            <h5>Filtros</h5>
+          </div>
+          <div class="filtroCiudad input-field">
+            <p><label for="selectCiudad">Ciudad:</label><br></p>
+            <select name="ciudad" id="selectCiudad">
+              <option value="" selected>Elige una ciudad</option>
+            </select>
+          </div>
+          <div class="filtroTipo input-field">
+            <p><label for="selectTipo">Tipo:</label></p>
+            <br>
+            <select name="tipo" id="selectTipo">
+              <option value="">Elige un tipo</option>
+            </select>
+          </div>
+          <div class="filtroPrecio">
+            <label for="rangoPrecio">Precio:</label>
+            <input type="text" id="rangoPrecio" name="precio" value="" />
+          </div>
+          <div class="botonField">
+            <input type="button" class="btn white" value="Buscar" id="btnBuscar">
+          </div>
+        </div>
+
+    </div>
+    <div id="tabs" style="width: 75%;">
+      <ul>
+        <li><a href="#tabs-1">Bienes disponibles</a></li>
+        <li id="misBienes"><a href="#tabs-2">Mis bienes</a></li>
+      </ul>
+
+      <div id="tabs-1">
+        <div class="colContenido" id="divResultadosBusqueda">
+          <div class="tituloContenido card" style="justify-content: center;">
+            <h5>Resultados de la búsqueda:</h5>
+            <div class="divider"></div>
+
+            <div class="row">
+                <span id="datos" class="gray-text"></span>
+            </div>
+
+<!--
+            <div class="row">
+              <div class="col s12 m5">
+                <div class="card-panel teal">
+                  <span class="white-text">
+                    contenido
+                  </span>
+                </div>
+              </div>
+            </div>
+-->
+
+          </div>
+        </div>
+      </div>
+
+      <div id="tabs-2" >
+        <div class="colContenido" id="divBienesGuardados">
+          <div class="tituloContenido card" style="justify-content: center;">
+            <h5>Bienes guardados:</h5>
+            <div class="divider"></div>
+
+            <div class="row">
+              <span id="datosGuardados" class="gray-text"></span>
+            </div>
+
+
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script type="text/javascript" src="js/jquery-1.12.4.js"></script>
+  <script type="text/javascript" src="js/ion.rangeSlider.min.js"></script>
+  <script type="text/javascript" src="js/materialize.min.js"></script>
+  <script type="text/javascript" src="js/index.js"></script>
+  <script type="text/javascript" src="js/buscador.js"></script>
+  <script type="text/javascript" src="js/jquery-ui.js"></script>
+  <script type="text/javascript">
+
+    $( document ).ready(function() {
+      $( "#tabs" ).tabs();
+
+      // para cargar los datos guardados en la base de datos al hacer clic en la pestaña "tabs-2"
+      $("#misBienes").click(function(){
+
+          // consulto la base de datos
+          $.get("controlador.php", function(data, status){
+              //alert("Data: " + data[0].Ciudad + "\nStatus: " + status);
+
+              var myJSON = JSON.stringify(data);
+              console.log(data);
+
+              var miHtml = "";
+
+            for (var i=0;i<data.length;i++) {
+              var item = data[i];
+
+              miHtml +=
+
+              "<div class='col s12'>  " +
+
+              "<div class='col s4'>  " +
+              "<img src='img/home.jpg' class='responsive-img' alt=''>" +
+              "</div>" +
+
+              "<div class='col s8'> " +
+
+              "<div class='card-panel grey lighten-3'>" +
+              "<b>Dirección:</b> " + data[i].Direccion + " " +
+              "<br />" +
+              "<b>Ciudad:</b> " + data[i].Ciudad + " " +
+              "<br />" +
+              "<b>Teléfono:</b> " + data[i].Telefono + " " +
+              "<br />" +
+              "<b>Código postal:</b> " + data[i].Codigo_Postal + " " +
+              "<br />" +
+              "<b>Tipo:</b> " + data[i].Tipo + " " +
+              "<br />" +
+              "<b>Precio:</b> " + data[i].Precio + " " +
+              "<br />" +
+              "<div />" +
+              "</div>" +
+
+              "</div>" +
+              "</br>";
+            }
+
+            $("#datosGuardados").html(miHtml);
+
+          });
+
+        /*
+        $.ajax({
+          crossOrigin: true,
+          url: "controlador.php",
+          success: function(data) {
+            console.log(data);
+            var myJSON = JSON.stringify(data);
+
+
+          }
+        });
+
+         */
+      });
+
+      $("#btnBuscar").click(function(){
+
+        var selectCiudad =  $("#selectCiudad").val();
+        var selectTipo =  $("#selectTipo").val();
+
+        buscarDatos(selectCiudad, selectTipo);
+      });
+
+    });
+
+    var arrayCiudad = [];
+    var arrayTipo = [];
+
+    // Para llenar el select de Ciudad y tipo
+    $.getJSON("data-1.json", function(data) {
+      $.each(data, function(i, field) {
+
+        var existCiudad = false;
+
+        for (var j = 0; j <= arrayCiudad.length; j++) {
+
+          if ( arrayCiudad[j] == data[i].Ciudad ) {
+            existCiudad = true;
+              break;
+          }
+        }
+
+        if ( !existCiudad ) {
+           arrayCiudad.push(data[i].Ciudad);
+          $('#selectCiudad').append($('<option>').text(data[i].Ciudad).attr('value', data[i].Ciudad));
+        }
+
+        // codigo para el tipo
+        var existTipo = false;
+
+        for (var j = 0; j <= arrayTipo.length; j++) {
+
+          if ( arrayTipo[j] == data[i].Tipo ) {
+            existTipo = true;
+            break;
+          }
+        }
+
+        if ( !existTipo ) {
+          arrayTipo.push(data[i].Tipo);
+
+          $('#selectTipo').append($('<option>').text(data[i].Tipo).attr('value', data[i].Tipo));
+        }
+      });
+    });
+
+    // Cargar los datos al inicio
+    $.getJSON("data-1.json", function(data){
+        $.each(data, function(i, field) {
+
+            $("#datos").append(
+
+                "<div class='col s12'>  " +
+
+                    "<div class='col s4'>  " +
+                      "<img src='img/home.jpg' class='responsive-img' alt=''>" +
+                    "</div>" +
+
+                    "<div class='col s8'> " +
+
+                        "<div class='card-panel grey lighten-3'>" +
+                          "<b>Dirección:</b> " + data[i].Direccion + " " +
+                          "<br />" +
+                          "<b>Ciudad:</b> " + data[i].Ciudad + " " +
+                          "<br />" +
+                          "<b>Teléfono:</b> " + data[i].Telefono + " " +
+                          "<br />" +
+                          "<b>Código postal:</b> " + data[i].Codigo_Postal + " " +
+                          "<br />" +
+                          "<b>Tipo:</b> " + data[i].Tipo + " " +
+                            "<br />" +
+                          "<b>Precio:</b> " + data[i].Precio + " " +
+                          "<br />" +
+                          "<input type='button' id='" + data[i].Id + "'  value='Guardar' class='waves-effect waves-light btn btnGuardar' data-id='" + data[i].Id + "'>" +
+
+                        "<div />" +
+
+                    "</div>" +
+
+                "</div>" +
+                "</br>"
+            );
+            //console.log(data[i].Direccion);
+
+          // Para guardar los datos en la base de datos (evento)
+          $("#" + data[i].Id ).click(function(){
+
+            $.post("controlador.php",
+            {
+                Id: data[i].Id,
+                Direccion: data[i].Direccion,
+                Ciudad: data[i].Ciudad,
+                Telefono: data[i].Telefono,
+                Codigo_Postal: data[i].Codigo_Postal,
+                Tipo: data[i].Tipo,
+                Precio: data[i].Precio,
+              },
+              function(data, status){
+
+                  var error = data.substring(1, 6);
+
+                  if (error === "Error") {
+                    alert("Error, el bien seleccionado ya se registro !");
+
+                  }
+                  else
+                  {
+                    alert("Bien guardado correctamente...");
+
+                  }
+            });
+          });
+
+        });
+    });
+
+    function buscarDatos(ciudad, tipo){
+
+      $("#datos").html("");
+
+      $.getJSON("data-1.json", function(data){
+
+        $.each(data, function(i, field) {
+
+          if ( (data[i].Ciudad == ciudad && data[i].Tipo == tipo)  ) {
+
+               $("#datos").append(
+
+                       "<div class='col s12'>  " +
+
+                       "<div class='col s4'>  " +
+                       "<img src='img/home.jpg' class='responsive-img' alt=''>" +
+                       "</div>" +
+
+                       "<div class='col s8'> " +
+
+                       "<div class='card-panel grey lighten-3'>" +
+                       "<b>Dirección:</b> " + data[i].Direccion + " " +
+                       "<br />" +
+                       "<b>Ciudad:</b> " + data[i].Ciudad + " " +
+                       "<br />" +
+                       "<b>Teléfono:</b> " + data[i].Telefono + " " +
+                       "<br />" +
+                       "<b>Código postal:</b> " + data[i].Codigo_Postal + " " +
+                       "<br />" +
+                       "<b>Tipo:</b> " + data[i].Tipo + " " +
+                       "<br />" +
+                       "<b>Precio:</b> " + data[i].Precio + " " +
+                       "<br />" +
+                       "<input type='button' id='" + data[i].Id + "'  value='Guardar' class='waves-effect waves-light btn btnGuardar' data-id='" + data[i].Id + "'>" +
+
+                       "<div />" +
+
+                       "</div>" +
+
+                       "</div>" +
+                       "</br>"
+               );
+               //console.log(data[i].Direccion);
+
+               // Para guardar los datos en la base de datos (evento)
+               $("#" + data[i].Id ).click(function(){
+
+                 $.post("controlador.php",
+                         {
+                           Id: data[i].Id,
+                           Direccion: data[i].Direccion,
+                           Ciudad: data[i].Ciudad,
+                           Telefono: data[i].Telefono,
+                           Codigo_Postal: data[i].Codigo_Postal,
+                           Tipo: data[i].Tipo,
+                           Precio: data[i].Precio,
+                         },
+                         function(data, status){
+
+                           var error = data.substring(1, 6);
+
+                           if (error === "Error") {
+                             alert("Error, el bien seleccionado ya se registro !");
+
+                           }
+                           else
+                           {
+                             alert("Bien guardado correctamente...");
+
+                           }
+                         });
+               });
+
+          }
+
+        });
+      });
+
+      $.getJSON("data-1.json", function(data){
+
+        $.each(data, function(i, field) {
+
+          if ( (data[i].Ciudad == ciudad && tipo == "")  ) {
+
+            $("#datos").append(
+
+                    "<div class='col s12'>  " +
+
+                    "<div class='col s4'>  " +
+                    "<img src='img/home.jpg' class='responsive-img' alt=''>" +
+                    "</div>" +
+
+                    "<div class='col s8'> " +
+
+                    "<div class='card-panel grey lighten-3'>" +
+                    "<b>Dirección:</b> " + data[i].Direccion + " " +
+                    "<br />" +
+                    "<b>Ciudad:</b> " + data[i].Ciudad + " " +
+                    "<br />" +
+                    "<b>Teléfono:</b> " + data[i].Telefono + " " +
+                    "<br />" +
+                    "<b>Código postal:</b> " + data[i].Codigo_Postal + " " +
+                    "<br />" +
+                    "<b>Tipo:</b> " + data[i].Tipo + " " +
+                    "<br />" +
+                    "<b>Precio:</b> " + data[i].Precio + " " +
+                    "<br />" +
+                    "<input type='button' id='" + data[i].Id + "'  value='Guardar' class='waves-effect waves-light btn btnGuardar' data-id='" + data[i].Id + "'>" +
+
+                    "<div />" +
+
+                    "</div>" +
+
+                    "</div>" +
+                    "</br>"
+            );
+            //console.log(data[i].Direccion);
+
+            // Para guardar los datos en la base de datos (evento)
+            $("#" + data[i].Id ).click(function(){
+
+              $.post("controlador.php",
+                      {
+                        Id: data[i].Id,
+                        Direccion: data[i].Direccion,
+                        Ciudad: data[i].Ciudad,
+                        Telefono: data[i].Telefono,
+                        Codigo_Postal: data[i].Codigo_Postal,
+                        Tipo: data[i].Tipo,
+                        Precio: data[i].Precio,
+                      },
+                      function(data, status){
+
+                        var error = data.substring(1, 6);
+
+                        if (error === "Error") {
+                          alert("Error, el bien seleccionado ya se registro !");
+
+                        }
+                        else
+                        {
+                          alert("Bien guardado correctamente...");
+
+                        }
+                      });
+            });
+
+          }
+
+        });
+      });
+
+      $.getJSON("data-1.json", function(data){
+
+        $.each(data, function(i, field) {
+
+          if ( (data[i].Tipo == tipo && ciudad == "")  ) {
+
+            $("#datos").append(
+
+                    "<div class='col s12'>  " +
+
+                    "<div class='col s4'>  " +
+                    "<img src='img/home.jpg' class='responsive-img' alt=''>" +
+                    "</div>" +
+
+                    "<div class='col s8'> " +
+
+                    "<div class='card-panel grey lighten-3'>" +
+                    "<b>Dirección:</b> " + data[i].Direccion + " " +
+                    "<br />" +
+                    "<b>Ciudad:</b> " + data[i].Ciudad + " " +
+                    "<br />" +
+                    "<b>Teléfono:</b> " + data[i].Telefono + " " +
+                    "<br />" +
+                    "<b>Código postal:</b> " + data[i].Codigo_Postal + " " +
+                    "<br />" +
+                    "<b>Tipo:</b> " + data[i].Tipo + " " +
+                    "<br />" +
+                    "<b>Precio:</b> " + data[i].Precio + " " +
+                    "<br />" +
+                    "<input type='button' id='" + data[i].Id + "'  value='Guardar' class='waves-effect waves-light btn btnGuardar' data-id='" + data[i].Id + "'>" +
+
+                    "<div />" +
+
+                    "</div>" +
+
+                    "</div>" +
+                    "</br>"
+            );
+            //console.log(data[i].Direccion);
+
+            // Para guardar los datos en la base de datos (evento)
+            $("#" + data[i].Id ).click(function(){
+
+              $.post("controlador.php",
+                      {
+                        Id: data[i].Id,
+                        Direccion: data[i].Direccion,
+                        Ciudad: data[i].Ciudad,
+                        Telefono: data[i].Telefono,
+                        Codigo_Postal: data[i].Codigo_Postal,
+                        Tipo: data[i].Tipo,
+                        Precio: data[i].Precio,
+                      },
+                      function(data, status){
+
+                        var error = data.substring(1, 6);
+
+                        if (error === "Error") {
+                          alert("Error, el bien seleccionado ya se registro !");
+
+                        }
+                        else
+                        {
+                          alert("Bien guardado correctamente...");
+
+                        }
+                      });
+            });
+
+          }
+
+        });
+      });
+    }
+
+  </script>
+</body>
+</html>
+
+
